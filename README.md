@@ -12,3 +12,9 @@ Dev
 4. Run the microservices that are going to be consumed up.
 5. Run project with `npm run start:dev`
 
+## Nats
+Run Nats server
+```
+docker run -d --name nats-main -p 4222:4222 -p 6222:6222 -p 8222:8222 nats
+```
+

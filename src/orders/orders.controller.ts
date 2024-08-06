@@ -9,28 +9,21 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  CreateOrderDto,
-  OrderPaginationDto,
-  OrderStatusDto,
-  UpdateOrderDto,
-} from './dto';
-import { ORDER_SERVICE } from '../config';
+import { CreateOrderDto, OrderPaginationDto, OrderStatusDto } from './dto';
+import { NATS_SERVICE } from '../config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { PaginationDto } from '../common';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(
-    @Inject(ORDER_SERVICE) private readonly ordersClient: ClientProxy,
-  ) {}
+  constructor(@Inject(NATS_SERVICE) private readonly natsClient: ClientProxy) {}
 
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto) {
     try {
       return await firstValueFrom(
-        this.ordersClient.send('createOrder', createOrderDto),
+        this.natsClient.send('createOrder', createOrderDto),
       );
     } catch (e) {
       throw new RpcException(e);
@@ -41,7 +34,7 @@ export class OrdersController {
   async findAll(@Query() paginationDto: OrderPaginationDto) {
     try {
       return await firstValueFrom(
-        this.ordersClient.send('findAllOrders', paginationDto),
+        this.natsClient.send('findAllOrders', paginationDto),
       );
     } catch (e) {
       throw new RpcException(e);
@@ -55,7 +48,7 @@ export class OrdersController {
   ) {
     try {
       return await firstValueFrom(
-        this.ordersClient.send('findAllOrders', {
+        this.natsClient.send('findAllOrders', {
           ...paginationDto,
           ...status,
         }),
@@ -68,9 +61,7 @@ export class OrdersController {
   @Get('id/:id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
-      return await firstValueFrom(
-        this.ordersClient.send('findOneOrder', { id }),
-      );
+      return await firstValueFrom(this.natsClient.send('findOneOrder', { id }));
     } catch (e) {
       throw new RpcException(e);
     }
@@ -83,7 +74,7 @@ export class OrdersController {
   ) {
     try {
       return await firstValueFrom(
-        this.ordersClient.send('changeOrderStatus', { id, ...status }),
+        this.natsClient.send('changeOrderStatus', { id, ...status }),
       );
     } catch (e) {
       throw new RpcException(e);
