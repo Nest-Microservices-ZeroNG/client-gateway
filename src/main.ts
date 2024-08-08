@@ -25,7 +25,7 @@ async function bootstrap() {
 
   await app.listen(envs.port);
 
-  console.log('Hello World - Testing Git Submodules!!');
+  console.log('Hello World - 2nd Testing Git Submodules!!');
   
 
   logger.log(`Gateway running on port ${envs.port}`);
